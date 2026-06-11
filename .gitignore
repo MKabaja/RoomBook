@@ -30,3 +30,4 @@ frontend/dist/
 frontend/dist-ssr/
 frontend/*.local
 frontend/.env
+frontend/.vite/
