@@ -2,4 +2,13 @@
 
 declare(strict_types=1);
 
-// Routes will be added in feature branches
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
+
+// Auth routes
+
+Route::controller(AuthController::class)->group(function () {
+    Route::post('/register', 'register');
+    Route::post('/login', 'login');
+    Route::post('/logout', 'logout')->middleware('auth:sanctum');
+});
