@@ -20,7 +20,10 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'room_id' => ['required', 'integer', 'exists:rooms,id'],
+            'starts_at' => ['required', 'date', 'after:now'],
+            'ends_at' => ['required', 'date', 'after:starts_at'],
+            'participants_count' => ['required', 'integer', 'min:1'],
         ];
     }
 }
