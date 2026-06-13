@@ -24,7 +24,7 @@ class BookingController extends Controller
     {
         $createdBookings = $this->bookingService->getForUser($request->user());
 
-        return response()->json($createdBookings);
+        return response()->json($createdBookings, 200);
     }
 
     public function store(StoreBookingRequest $request): JsonResponse
@@ -32,7 +32,7 @@ class BookingController extends Controller
         $bookingData = BookingData::fromRequest($request, $request->user()->id);
         $booking = $this->bookingService->store($bookingData);
 
-        return response()->json($booking);
+        return response()->json($booking, 201);
     }
 
     public function cancel(Booking $booking): JsonResponse
@@ -40,7 +40,6 @@ class BookingController extends Controller
         $this->authorize('cancel', $booking);
         $booking = $this->bookingService->cancel($booking);
 
-        return response()->json($booking);
-
+        return response()->json($booking, 200);
     }
 }

@@ -30,4 +30,35 @@ class BookingFactory extends Factory
             'status' => BookingStatus::Pending,
         ];
     }
+
+    public function confirmed(): static
+    {
+        return $this->state(['status' => BookingStatus::Confirmed]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(['status' => BookingStatus::Cancelled]);
+    }
+
+    public function forRoom(Room $room): static
+    {
+        return $this->state([
+            'room_id' => $room->id,
+            'participants_count' => fake()->numberBetween(1, $room->capacity),
+        ]);
+    }
+
+    public function forUser(User $user): static
+    {
+        return $this->state(['user_id' => $user->id]);
+    }
+
+    public function startingAt(Carbon $start, int $durationHours = 2): static
+    {
+        return $this->state([
+            'starts_at' => $start,
+            'ends_at' => $start->copy()->addHours($durationHours),
+        ]);
+    }
 }

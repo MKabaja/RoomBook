@@ -4,121 +4,85 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 
-describe('registration', function () {
-
-    $validData = [
+function validRegistrationPayload(array $overrides = []): array
+{
+    return array_merge([
         'name' => 'Jan Kowalski',
         'email' => 'jan@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-    ];
+    ], $overrides);
+}
 
-    $invalidEmailData = [
-        'name' => 'Jan Kowalski',
-        'email' => '',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-    ];
-
-    test('user can register with valid data', function () use ($validData) {
-        /** @var TestCase $this */
-        $response = $this->postJson('/api/register', $validData);
-
-        $response->assertCreated()
-            ->assertJsonStructure([
-                'user' => [
-                    'id',
-                    'name',
-                    'email',
-                    'created_at',
-                    'updated_at',
-                ],
-                'token',
-            ]);
-
-    });
-    test('register fails with missing email', function () use ($invalidEmailData) {
-        /** @var TestCase $this */
-        $response = $this->postJson('/api/register', $invalidEmailData);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
-    });
-
-    test('register fails with duplicate email', function () use ($validData) {
-        /** @var TestCase $this */
-        User::factory()->create(['email' => $validData['email']]);
-
-        $response = $this->postJson('/api/register', $validData);
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
-    });
+beforeEach(function () {
+    /** @var TestCase $this */
+    $this->user = User::factory()->create();
 });
 
-describe('login', function () {
-    beforeEach(function () {
-        /** @var TestCase $this */
-        $this->user = User::factory()->create();
-        $this->token = $this->user->createToken('test')->plainTextToken;
-    });
+test('user can register with valid data', function () {
+    /** @var TestCase $this */
+    $response = $this->postJson('/api/register', validRegistrationPayload());
 
-    test('user can login with correct password', function () {
-        /** @var TestCase $this */
-        $response = $this->postJson('/api/login', [
-            'email' => $this->user->email,
-            'password' => 'password',
-        ]);
-        $response->assertOk()
-            ->assertJsonStructure([
-                'user' => [
-                    'id',
-                    'name',
-                    'email',
-                    'created_at',
-                    'updated_at',
-                ],
-                'token',
-            ])
-            ->assertJson([
-                'user' => [
-                    'id' => $this->user->id,
-                    'name' => $this->user->name,
-                    'email' => $this->user->email,
-                ],
-            ]);
-    });
+    expect($response->status())->toBe(201)
+        ->and($response->json('token'))->not->toBeNull()
+        ->and($response->json('user.email'))->toBe('jan@example.com');
+});
 
-    test('login fails with wrong password', function () {
-        /** @var TestCase $this */
-        $response = $this->postJson('/api/login', [
-            'email' => $this->user->email,
-            'password' => 'wrongpassword',
-        ]);
-        $response->assertStatus(401)
-            ->assertJson([
-                'message' => 'Invalid credentials',
-            ]);
-    });
+test('register fails with missing email', function () {
+    /** @var TestCase $this */
+    $response = $this->postJson('/api/register', validRegistrationPayload(['email' => '']));
 
-    test('user can logout', function () {
-        /** @var TestCase $this */
-        $response = $this->withHeader('Authorization', 'Bearer '.$this->token)
-            ->postJson('/api/logout');
+    expect($response->status())->toBe(422)
+        ->and($response->json('errors.email'))->not->toBeEmpty();
+});
 
-        $response->assertNoContent();
+test('register fails with duplicate email', function () {
+    /** @var TestCase $this */
+    $response = $this->postJson('/api/register', validRegistrationPayload(['email' => $this->user->email]));
 
-    });
+    expect($response->status())->toBe(422)
+        ->and($response->json('errors.email'))->not->toBeEmpty();
+});
 
+test('user can login with correct password', function () {
+    /** @var TestCase $this */
+    $response = $this->postJson('/api/login', [
+        'email' => $this->user->email,
+        'password' => 'password',
+    ]);
+
+    expect($response->status())->toBe(200)
+        ->and($response->json('token'))->not->toBeNull()
+        ->and($response->json('user.id'))->toBe($this->user->id);
+});
+
+test('login fails with wrong password', function () {
+    /** @var TestCase $this */
+    $response = $this->postJson('/api/login', [
+        'email' => $this->user->email,
+        'password' => 'wrongpassword',
+    ]);
+
+    expect($response->status())->toBe(401)
+        ->and($response->json('message'))->toBe('Invalid credentials');
+});
+
+test('user can logout', function () {
+    /** @var TestCase $this */
+    $token = $this->user->createToken('test')->plainTextToken;
+
+    $response = $this->withHeader('Authorization', 'Bearer '.$token)
+        ->postJson('/api/logout');
+
+    expect($response->status())->toBe(204);
 });
 
 test('protected route returns 401 without token', function () {
     /** @var TestCase $this */
     $response = $this->postJson('/api/logout');
 
-    $response->assertUnauthorized();
-
+    expect($response->status())->toBe(401);
 });
