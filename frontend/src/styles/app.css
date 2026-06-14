@@ -1,3 +1,7 @@
 @import "tailwindcss";
+
+@source "../**/*.vue";
+@source "../**/*.ts";
+
 @import "./theme.css";
 @import "./globals.css";
