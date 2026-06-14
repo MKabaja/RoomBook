@@ -2,11 +2,11 @@
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '@/stores/auth';
-  import BaseForm from '@/components/BaseForm.vue';
-  import BaseInput from '@/components/BaseInput.vue';
-  import BaseButton from '@/components/BaseButton.vue';
-  import AppLogo from '@/components/AppLogo.vue';
-  import BaseAlert from '@/components/BaseAlert.vue';
+  import BaseForm from '@/components/base/BaseForm.vue';
+  import BaseInput from '@/components/base/BaseInput.vue';
+  import BaseButton from '@/components/base/BaseButton.vue';
+  import AppLogo from '@/components/layout/AppLogo.vue';
+  import BaseAlert from '@/components/base/BaseAlert.vue';
 
   const router = useRouter();
   const authStore = useAuthStore();
@@ -46,7 +46,8 @@
       if (err.response?.status === 422) {
         errors.value = err.response.data.errors ?? {};
       } else {
-        generalError.value = err.response?.data?.message ?? 'Something went wrong. Please try again.'
+        generalError.value =
+          err.response?.data?.message ?? 'Something went wrong. Please try again.';
       }
     } finally {
       isLoading.value = false;
