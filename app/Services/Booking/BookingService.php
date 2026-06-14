@@ -9,6 +9,7 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class BookingService
@@ -17,19 +18,20 @@ final class BookingService
 
     public function store(BookingData $data): Booking
     {
-        $this->validationPipeline->validate($data);
+        return DB::transaction(function () use ($data): Booking {
+            $this->validationPipeline->validate($data);
 
-        $booking = Booking::create([
-            'room_id' => $data->roomId,
-            'user_id' => $data->userId,
-            'starts_at' => $data->startsAt,
-            'ends_at' => $data->endsAt,
-            'participants_count' => $data->participantsCount,
-            'status' => BookingStatus::Pending,
-        ]);
+            $booking = Booking::create([
+                'room_id' => $data->roomId,
+                'user_id' => $data->userId,
+                'starts_at' => $data->startsAt,
+                'ends_at' => $data->endsAt,
+                'participants_count' => $data->participantsCount,
+                'status' => BookingStatus::Pending,
+            ]);
 
-        return $booking->load('room');
-
+            return $booking->load('room');
+        });
     }
 
     public function cancel(Booking $booking): Booking

@@ -7,7 +7,6 @@ namespace App\Services\Booking\Validators;
 use App\DataTransferObjects\BookingData;
 use App\Models\Booking;
 use App\Services\Booking\Contracts\BookingValidatorInterface;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class AvailabilityValidator implements BookingValidatorInterface
@@ -23,12 +22,10 @@ final class AvailabilityValidator implements BookingValidatorInterface
 
     private function hasConflict(BookingData $data): bool
     {
-        return (bool) DB::transaction(function () use ($data) {
-            return Booking::where('room_id', $data->roomId)
-                ->active()
-                ->overlapping($data->startsAt, $data->endsAt)
-                ->lockForUpdate()
-                ->exists();
-        });
+        return Booking::where('room_id', $data->roomId)
+            ->active()
+            ->overlapping($data->startsAt, $data->endsAt)
+            ->lockForUpdate()
+            ->exists();
     }
 }
