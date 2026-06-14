@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 type Variants = 'primary' | 'accent' | 'danger' | 'ghost' | 'disabled'
 type Sizes = 'sm' | 'md' | 'lg'
 
@@ -35,10 +37,10 @@ function buttonClasses(variant: Variants, size: Sizes) {
   return `${base} ${variants[variant]} ${sizes[size]}`
 }
 
-const classes = buttonClasses(props.variant, props.size)
+const classes = computed(() => buttonClasses(props.variant, props.size))
 </script>
 
 <template>
-  <a v-if="href" :class="[classes, className]" :href="href">{{ label }}</a>
+  <a v-if="href" :class="[classes, className]" :href="href" :inert="variant === 'disabled' || undefined">{{ label }}</a>
   <button v-else :class="[classes, className]" :disabled="variant === 'disabled'">{{ label }}</button>
 </template>

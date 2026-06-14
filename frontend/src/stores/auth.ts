@@ -11,9 +11,17 @@ type AuthResponse = {
   token: string;
 };
 
+function parseStoredUser(): AuthUser {
+  try {
+    return JSON.parse(localStorage.getItem('user') ?? 'null')
+  } catch {
+    return null
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<AuthToken>(localStorage.getItem('token'));
-  const user = ref<AuthUser>(JSON.parse(localStorage.getItem('user') ?? 'null'));
+  const user = ref<AuthUser>(parseStoredUser());
   const isAuthenticated = computed(() => !!token.value);
 
   async function login(email: string, password: string) {
@@ -41,11 +49,6 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null;
     user.value = null;
   }
-  function loadFromStorage() {
-    const storage = localStorage.getItem('token');
-    if (storage !== null) token.value = storage;
-  }
-
   function setAuth(data: AuthResponse) {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
@@ -53,5 +56,5 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user;
   }
 
-  return { token, user, isAuthenticated, login, register, loadFromStorage, logout };
+  return { token, user, isAuthenticated, login, register, logout };
 });

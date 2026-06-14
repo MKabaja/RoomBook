@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { useId } from 'vue';
+
   type InputType = 'text' | 'email' | 'password' | 'number' | 'datetime-local';
 
   type InputProps = {
@@ -13,6 +15,8 @@
     type: 'text'
   });
 
+  const id = useId();
+
   defineEmits<{
     'update:modelValue': [value: string];
   }>();
@@ -20,11 +24,11 @@
 
 <template>
   <div class="flex flex-col gap-1.5">
-    <label :for="label" class="text-xs font-medium tracking-wide text-text-secondary">
+    <label :for="id" class="text-xs font-medium tracking-wide text-text-secondary">
       {{ label }}
     </label>
     <input
-      :id="label"
+      :id="id"
       :type="type"
       :value="modelValue"
       :placeholder="placeholder"

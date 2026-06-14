@@ -6,6 +6,7 @@
   import BaseInput from '@/components/BaseInput.vue';
   import BaseButton from '@/components/BaseButton.vue';
   import AppLogo from '@/components/AppLogo.vue';
+  import BaseAlert from '@/components/BaseAlert.vue';
 
   const router = useRouter();
   const authStore = useAuthStore();
@@ -19,6 +20,7 @@
 
   const isLoading = ref(false);
   const errors = ref<Record<string, string[]>>({});
+  const generalError = ref<string | null>(null);
 
   function fieldError(field: string): string | undefined {
     return errors.value[field]?.[0];
@@ -26,9 +28,8 @@
 
   async function handleSubmit() {
     errors.value = {};
+    generalError.value = null;
     isLoading.value = true;
-    console.log(isLogin.value);
-
     try {
       if (isLogin.value) {
         await authStore.login(email.value, password.value);
@@ -44,6 +45,8 @@
     } catch (err: any) {
       if (err.response?.status === 422) {
         errors.value = err.response.data.errors ?? {};
+      } else {
+        generalError.value = err.response?.data?.message ?? 'Something went wrong. Please try again.'
       }
     } finally {
       isLoading.value = false;
@@ -53,6 +56,7 @@
   function switchMode() {
     isLogin.value = !isLogin.value;
     errors.value = {};
+    generalError.value = null;
   }
 </script>
 
@@ -90,6 +94,8 @@
         <div class="mb-6">
           <AppLogo size="lg" :subtitle="true" />
         </div>
+
+        <BaseAlert v-if="generalError" :message="generalError" />
 
         <BaseForm class="flex flex-col gap-4" @submit="handleSubmit">
           <BaseInput

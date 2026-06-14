@@ -1,17 +1,20 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   size?: 'sm' | 'md' | 'lg'
   subtitle?: boolean
-}>()
+}>(), {
+  size: 'md',
+  subtitle: false
+})
 </script>
 
 <template>
   <div :class="subtitle ? 'text-center' : 'flex items-center gap-2'">
     <div
       :class="{
-        'text-base': size === 'sm',
-        'text-[16px]': size === 'md' || !size,
-        'text-[22px]': size === 'lg'
+        'text-sm': size === 'sm',
+        'text-base': size === 'md',
+        'text-xl': size === 'lg'
       }"
       class="font-bold tracking-tight leading-none"
     >
