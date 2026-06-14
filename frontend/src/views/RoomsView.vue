@@ -20,6 +20,8 @@
 
     <BaseAlert v-else-if="error" :message="error" />
 
+    <BaseAlert v-else-if="rooms.length === 0" variant="warning" message="No rooms available." />
+
     <ul v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <RoomCard v-for="room in rooms" :key="room.id" :room="room" />
     </ul>

@@ -33,7 +33,7 @@
       <IconRoom :size="32" />
     </div>
 
-    <div class="mb-1.5 text-md font-semibold text-text-primary">{{ room.name }}</div>
+    <div class="mb-1.5 text-base font-semibold text-text-primary">{{ room.name }}</div>
 
     <div class="mb-3.5 flex items-center gap-1.5 text-xs text-text-secondary">
       <IconUsers />
@@ -42,14 +42,13 @@
 
     <CapacityBar :value="room.capacity" :max="MAX_CAPACITY" class="mb-4" />
 
-    <div class="flex items-center justify-between">
+    <div class="flex items-center">
       <button
         @click="reserve"
         class="inline-flex items-center rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-hover"
       >
         Reserve →
       </button>
-      <span class="font-mono text-xs text-success">● available</span>
     </div>
   </li>
 </template>
