@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { useAuthStore } from '@/stores/auth'
+import Navbar from '@/components/Navbar.vue'
+
+const authStore = useAuthStore()
 </script>
 
 <template>
-  <HelloWorld />
+  <Navbar v-if="authStore.isAuthenticated" />
+  <router-view />
 </template>

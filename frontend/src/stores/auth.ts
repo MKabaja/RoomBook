@@ -13,7 +13,7 @@ type AuthResponse = {
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<AuthToken>(localStorage.getItem('token'));
-  const user = ref<AuthUser>(null);
+  const user = ref<AuthUser>(JSON.parse(localStorage.getItem('user') ?? 'null'));
   const isAuthenticated = computed(() => !!token.value);
 
   async function login(email: string, password: string) {
@@ -37,6 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     await api.post('/logout');
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     token.value = null;
     user.value = null;
   }
@@ -47,6 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   function setAuth(data: AuthResponse) {
     localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
     token.value = data.token;
     user.value = data.user;
   }

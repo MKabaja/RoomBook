@@ -8,7 +8,8 @@ const alias = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   server: {
-    port: 5173
+    port: 5174,
+    strictPort: true
   },
 
   resolve: {
