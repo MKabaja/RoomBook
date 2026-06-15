@@ -36,7 +36,7 @@ const { formatDateTime } = useDateTime()
         :variant="props.booking.status === 'cancelled' ? 'disabled' : 'danger'"
         size="sm"
         label="Cancel"
-        @click="emit('cancel', props.booking.id)"
+        @click="props.booking.status !== 'cancelled' && emit('cancel', props.booking.id)"
       />
     </td>
   </tr>

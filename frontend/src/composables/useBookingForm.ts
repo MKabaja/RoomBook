@@ -14,7 +14,7 @@ export function useBookingForm(roomId: Ref<number | null>) {
   const duration = computed(() => calculateDuration(startsAt.value, endsAt.value))
 
   async function submit(): Promise<boolean> {
-    if (!roomId.value) return false
+    if (!roomId.value || !startsAt.value || !endsAt.value) return false
 
     return createBooking({
       room_id: roomId.value,

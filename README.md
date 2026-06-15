@@ -200,20 +200,41 @@ cp .env.example .env
 cd frontend && cp .env.example .env && cd ..
 ```
 
-**2. Start containers**
+**2. Install Composer dependencies**
+
+`vendor/` is not committed to the repository — it must be built before starting Sail.
+
+If you have PHP installed locally:
+
+```bash
+composer install
+```
+
+If you don't have PHP locally, use a one-time Docker container (official Laravel method):
+
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install --ignore-platform-reqs
+```
+
+**3. Start containers**
 
 ```bash
 ./vendor/bin/sail up -d
 ```
 
-**3. Initialize the application**
+**4. Initialize the application**
 
 ```bash
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate --seed
 ```
 
-**4. Start the frontend**
+**5. Start the frontend**
 
 ```bash
 cd frontend
@@ -221,7 +242,7 @@ npm install
 npm run dev
 ```
 
-**5. Verify**
+**6. Verify**
 
 - Frontend: `http://localhost:5174`
 - API: `http://localhost:8000/api`

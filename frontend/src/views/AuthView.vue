@@ -14,8 +14,8 @@
 
   const isLogin = ref(true);
 
-  function switchMode(): void {
-    isLogin.value = !isLogin.value;
+  function switchMode(mode: boolean): void {
+    isLogin.value = mode;
     resetErrors();
   }
 
@@ -48,7 +48,7 @@
               ? 'bg-surface2 text-text-primary shadow-[inset_0_-2px_0_var(--color-primary)]'
               : 'text-text-secondary hover:text-text-primary'
           ]"
-          @click="switchMode"
+          @click="switchMode(true)"
         >
           Sign in
         </button>
@@ -59,7 +59,7 @@
               ? 'bg-surface2 text-text-primary shadow-[inset_0_-2px_0_var(--color-primary)]'
               : 'text-text-secondary hover:text-text-primary'
           ]"
-          @click="switchMode"
+          @click="switchMode(false)"
         >
           Register
         </button>

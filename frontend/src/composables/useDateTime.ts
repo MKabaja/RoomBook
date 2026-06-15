@@ -2,6 +2,7 @@ export function useDateTime() {
   function formatDateTime(value: string): string {
     if (!value) return '—'
     const date = new Date(value)
+    if (isNaN(date.getTime())) return '—'
     return (
       date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) +
       ' ' +
