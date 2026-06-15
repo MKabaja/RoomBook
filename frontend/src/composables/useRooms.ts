@@ -3,14 +3,12 @@ import api from '@/api/axios'
 import type { Room } from '@/types'
 import { extractErrorMessage } from '@/utils/errors'
 
-type RoomError = string | null
-
 export function useRooms() {
   const rooms = ref<Room[]>([])
   const loading = ref(false)
-  const error = ref<RoomError>(null)
+  const error = ref<string | null>(null)
 
-  async function fetchRooms() {
+  async function fetchRooms(): Promise<void> {
     loading.value = true
     error.value = null
 
@@ -24,10 +22,15 @@ export function useRooms() {
     }
   }
 
-  return {
+  const state = {
     rooms: readonly(rooms),
     loading: readonly(loading),
-    error: readonly(error),
+    error: readonly(error)
+  }
+
+  const actions = {
     fetchRooms
   }
+
+  return { ...state, ...actions }
 }
