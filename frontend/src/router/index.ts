@@ -11,7 +11,10 @@ const routes = [
   {
     path: '/bookings/create',
     component: BookingCreateView,
-    meta: { auth: true }
+    meta: { auth: true },
+    beforeEnter: (to) => {
+      if (!to.query.roomId) return '/rooms'
+    }
   },
   { path: '/bookings', component: BookingsView, meta: { auth: true } },
   { path: '/', redirect: '/rooms' }

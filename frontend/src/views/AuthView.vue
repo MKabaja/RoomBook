@@ -1,63 +1,37 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useAuthStore } from '@/stores/auth';
-  import BaseForm from '@/components/base/BaseForm.vue';
-  import BaseInput from '@/components/base/BaseInput.vue';
-  import BaseButton from '@/components/base/BaseButton.vue';
+  import { useAuth } from '@/composables/useAuth';
   import AppLogo from '@/components/layout/AppLogo.vue';
   import BaseAlert from '@/components/base/BaseAlert.vue';
+  import LoginForm from '@/components/auth/LoginForm.vue';
+  import RegisterForm from '@/components/auth/RegisterForm.vue';
+  import type { LoginFormData } from '@/components/auth/LoginForm.vue';
+  import type { RegisterFormData } from '@/components/auth/RegisterForm.vue';
 
   const router = useRouter();
-  const authStore = useAuthStore();
+  const { login, register, loading, errors, generalError, resetErrors } = useAuth();
 
   const isLogin = ref(true);
 
-  const name = ref('');
-  const email = ref('');
-  const password = ref('');
-  const passwordConfirmation = ref('');
-
-  const isLoading = ref(false);
-  const errors = ref<Record<string, string[]>>({});
-  const generalError = ref<string | null>(null);
-
-  function fieldError(field: string): string | undefined {
-    return errors.value[field]?.[0];
-  }
-
-  async function handleSubmit() {
-    errors.value = {};
-    generalError.value = null;
-    isLoading.value = true;
-    try {
-      if (isLogin.value) {
-        await authStore.login(email.value, password.value);
-      } else {
-        await authStore.register(
-          name.value,
-          email.value,
-          password.value,
-          passwordConfirmation.value
-        );
-      }
-      router.push('/rooms');
-    } catch (err: any) {
-      if (err.response?.status === 422) {
-        errors.value = err.response.data.errors ?? {};
-      } else {
-        generalError.value =
-          err.response?.data?.message ?? 'Something went wrong. Please try again.';
-      }
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  function switchMode() {
+  function switchMode(): void {
     isLogin.value = !isLogin.value;
-    errors.value = {};
-    generalError.value = null;
+    resetErrors();
+  }
+
+  async function handleLogin({ email, password }: LoginFormData): Promise<void> {
+    const ok = await login(email, password);
+    if (ok) router.push('/rooms');
+  }
+
+  async function handleRegister({
+    name,
+    email,
+    password,
+    passwordConfirmation
+  }: RegisterFormData): Promise<void> {
+    const ok = await register(name, email, password, passwordConfirmation);
+    if (ok) router.push('/rooms');
   }
 </script>
 
@@ -96,45 +70,10 @@
           <AppLogo size="lg" :subtitle="true" />
         </div>
 
-        <BaseAlert v-if="generalError" :message="generalError" />
+        <BaseAlert v-if="generalError" :message="generalError" class="mb-4" />
 
-        <BaseForm class="flex flex-col gap-4" @submit="handleSubmit">
-          <BaseInput
-            v-if="!isLogin"
-            v-model="name"
-            label="Full name"
-            placeholder="John Smith"
-            :error="fieldError('name')"
-          />
-          <BaseInput
-            v-model="email"
-            label="Email address"
-            type="email"
-            placeholder="john@company.com"
-            :error="fieldError('email')"
-          />
-          <BaseInput
-            v-model="password"
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            :error="fieldError('password')"
-          />
-          <BaseInput
-            v-if="!isLogin"
-            v-model="passwordConfirmation"
-            label="Confirm password"
-            type="password"
-            placeholder="••••••••"
-            :error="fieldError('password_confirmation')"
-          />
-
-          <BaseButton
-            :label="isLogin ? 'Sign in' : 'Create account'"
-            :variant="isLoading ? 'disabled' : 'primary'"
-            class="mt-2 w-full"
-          />
-        </BaseForm>
+        <LoginForm v-if="isLogin" :loading="loading" :errors="errors" @submit="handleLogin" />
+        <RegisterForm v-else :loading="loading" :errors="errors" @submit="handleRegister" />
       </div>
     </div>
   </div>
