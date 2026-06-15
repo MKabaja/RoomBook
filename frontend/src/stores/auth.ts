@@ -13,9 +13,9 @@ type AuthResponse = {
 
 function parseStoredUser(): AuthUser {
   try {
-    return JSON.parse(localStorage.getItem('user') ?? 'null')
+    return JSON.parse(localStorage.getItem('user') ?? 'null');
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -43,11 +43,14 @@ export const useAuthStore = defineStore('auth', () => {
     setAuth(response.data);
   }
   async function logout() {
-    await api.post('/logout');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    token.value = null;
-    user.value = null;
+    try {
+      await api.post('/logout');
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      token.value = null;
+      user.value = null;
+    }
   }
   function setAuth(data: AuthResponse) {
     localStorage.setItem('token', data.token);
