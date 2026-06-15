@@ -34,3 +34,10 @@ export interface PaginatedResponse<T> {
   per_page: number;
   total: number;
 }
+
+export interface BookingFormData {
+  room_id: number;
+  starts_at: string;
+  ends_at: string;
+  participants_count: number;
+}
